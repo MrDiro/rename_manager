@@ -1,20 +1,20 @@
-from os import system, getenv, sep, getcwd, rename
-from os.path import isfile, isdir, split, splitext, join
-from app.lib.book_errors import ArgumentError, ArgumentRangeError
+import os
+import platform as pf
+from app.lib.books import ArgumentError, ArgumentRangeError
 from time import sleep
 from colorama import Fore, Style
 from re import sub
 from glob import glob
-import platform as pf
 
 SELECT_CMD = ("all", "one", "punctuations_off", "punctuations_spc", "lower", "upper", "normalize_spc", "capitalize", "del_right", "del_left", "rename")
 LISTING_CMD = ("all", "f", "d")
-USER = getenv("USER")
+USER = os.getenv("USER")
 PROMPT = f"{Fore.CYAN}[{USER}]:>{Style.RESET_ALL} "
+HOME = os.path.join(os.sep, 'home', USER)
 
 def splitpathfile(arg:str) -> tuple:
 
-    return (f"{split(arg)[0]}/", splitext(split(arg)[1])[0], splitext(split(arg)[1])[1])
+    return (f"{os.path.split(arg)[0]}/", os.path.splitext(os.path.split(arg)[1])[0], os.path.splitext(os.path.split(arg)[1])[1])
 
 def slice_all(**kwargs) -> dict:
 
@@ -136,7 +136,7 @@ def save(*args):
 
         for k, v in args[0].items():
 
-            rename(v, args[1][k])
+            os.rename(v, args[1][k])
             sleep(0.01)
             print(f"\rRenombrando: [{round(100 * (i / float(total)), 0)}%]{ca * i}", end='')
             i += 1
@@ -149,14 +149,14 @@ def save(*args):
         newname = args[1][k]
         oldname = args[0][k]
         
-        rename(oldname, newname)
+        os.rename(oldname, newname)
 
     print("------------------------------------------------------------")
     print("{Fore.LIGHTGREEN_EX}[+] Operación realizada exitosa mente!{Style.RESET_ALL}")
 
 def here() -> str:
 
-    path = getcwd()
+    path = os.getcwd()
 
     print(f"{Fore.LIGHTGREEN_EX}[+] {path}{Style.RESET_ALL}")
 
@@ -164,7 +164,7 @@ def here() -> str:
 
 def back(*args) -> str:
 
-    lp = args[1].split(f"{sep}")
+    lp = args[1].split(f"{os.sep}")
     newpath = ""
 
     if args[0] == "":
@@ -193,7 +193,7 @@ def get_current_path(*args) -> str:
 
         return args[1]
 
-    return join(args[1], args[0])
+    return os.path.join(args[1], args[0])
 
 def go(*args) -> str:
 
@@ -203,25 +203,11 @@ def go(*args) -> str:
 
         raise ArgumentError("Argumento Invalido")
         
-    newpath = join(args[1], args[0])
+    newpath = os.path.join(args[1], args[0])
 
     print(f"{Fore.LIGHTGREEN_EX}[+] {newpath}{Style.RESET_ALL}")
 
     return newpath
-
-def get_initial_path(arg:str):
-
-    if pf.system() == "Linux":
-
-        return join(sep, 'home', arg)
-
-    elif pf.system() == "Windows":
-
-        return join('C:', 'users', arg)
-
-def cls():
-
-    system("clear")
 
 def listing(*args) -> dict:
 
@@ -234,11 +220,11 @@ def listing(*args) -> dict:
     
     elif LISTING_CMD[1] in args:
 
-        newdom = {str(k + 1): v for k, v in enumerate(olddom) if isfile(v)}
+        newdom = {str(k + 1): v for k, v in enumerate(olddom) if os.path.isfile(v)}
 
     elif LISTING_CMD[2] in args:
 
-        newdom = {str(k + 1): v for k, v in enumerate(olddom) if isdir(v)}
+        newdom = {str(k + 1): v for k, v in enumerate(olddom) if os.path.isdir(v)}
     
     else:
 

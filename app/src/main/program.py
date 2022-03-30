@@ -1,8 +1,9 @@
+import app.lib.tools as tools
+import app.lib.screen as screen
 from cmd import Cmd
-from app.lib.tools import get_initial_path, go, get_current_path, back, listing, here, select, save, USER, PROMPT
-from app.lib.screen import baner, show, listing_show, select_show, clear
-from app.lib.book_errors import ArgumentError, ArgumentRangeError
+from app.lib.books import ArgumentError, ArgumentRangeError
 from colorama import Fore, Style
+from os import system
 
 class Program (Cmd):
 
@@ -14,18 +15,15 @@ class Program (Cmd):
 
     def do_save(self, arg:str):
 
-        """
-        Guarda los cambios echos
-        ==============================================================
-        """
+        """Guarda los cambios echos"""
 
-        save(self.currentFiles, self.newNameFiles)
+        tools.save(self.currentFiles, self.newNameFiles)
         self.newNameFiles.clear()
 
     def do_select(self, arg:str):
+
         """
         Comandos para aplicar cambios a la cadena de texto
-        ==============================================================
 
         select [opcion] [complementos]
 
@@ -49,32 +47,24 @@ class Program (Cmd):
 
         try:
 
-            self.newNameFiles = select(arg, self.currentFiles)
-            select_show(**self.newNameFiles)
+            self.newNameFiles = tools.select(arg, self.currentFiles)
+            screen.select_show(**self.newNameFiles)
         
         except ArgumentError as msg:
 
             print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
 
-    def complete_select(self, text:str, arg:str, begidx, endidx):
-
-        pass
-
     def do_here(self, arg:str):
 
-        """
-        Se mueve a la ruta actual de ejecucion del programa
-        ==============================================================
-        """
+        """Se mueve a la ruta actual de ejecucion del programa"""
 
-        self.currentPath = here()
-        show(self.currentPath, self.currentPath)
+        self.currentPath = tools.here()
+        screen.show(self.currentPath, self.currentPath)
 
     def do_listing(self, arg:str):
 
         """
         Enlista los archivos del directorio actual
-        ==============================================================
 
         - all         todos los archivos del directorio
         - d           solo las carpetas
@@ -83,22 +73,17 @@ class Program (Cmd):
 
         try:
 
-            self.currentFiles = listing(arg, self.currentPath)
-            listing_show(**self.currentFiles)
+            self.currentFiles = tools.listing(arg, self.currentPath)
+            screen.listing_show(**self.currentFiles)
 
         except ArgumentError as msg:
 
             print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
 
-    def complete_listing(self, text, arg, begidx, endidx):
-
-        pass
-
     def do_show(self, arg:str):
 
         """
         Imprime una lista de directorio, actual o otra
-        ==============================================================
 
         - show [foldername]         muestra los archivos y carpetas de la ruta definida
         - show                      muestra los archivos y carpetas de la ruta actual
@@ -106,8 +91,8 @@ class Program (Cmd):
 
         try:
 
-            self.newPath = get_current_path(arg, self.currentPath)
-            show(self.currentPath, self.newPath)
+            self.newPath = tools.get_current_path(arg, self.currentPath)
+            screen.show(self.currentPath, self.newPath)
         
         except ArgumentError as msg:
 
@@ -117,40 +102,42 @@ class Program (Cmd):
 
         """
         Cambia de directorio
-        ==============================================================
+
         - go [foldername]           se mueve a la ruta definida
         """
 
         try:
 
-            self.currentPath = go(arg, self.currentPath)
-            show(self.currentPath, self.currentPath)
+            self.currentPath = tools.go(arg, self.currentPath)
+            screen.show(self.currentPath, self.currentPath)
         
         except ArgumentError as msg:
 
             print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
 
+    def complete_do(self, text:str, arg:str, begidx:int, endidx:int):
+
+        pass
+
     def do_cls(self, arg:str):
 
-        """
-        Limpia la pantalla
-        ==============================================================
-        """
+        """Limpia la pantalla"""
 
-        clear()
+        system("clear")
+        print(screen.BANER)
 
     def do_back(self, arg:str):
 
         """
         Regresa al directorio anterior
-        ==============================================================
+
         - back [n]          regresa atras segun el numero de carpeta definida
         """
 
         try:
 
-            self.currentPath = back(arg, self.currentPath)
-            show(self.currentPath, self.currentPath)
+            self.currentPath = tools.back(arg, self.currentPath)
+            screen.show(self.currentPath, self.currentPath)
         
         except ArgumentRangeError as msg:
 
@@ -162,10 +149,7 @@ class Program (Cmd):
 
     def do_quit(self, arg:str):
 
-        """
-        Termina con la ejecución del programa
-        ==============================================================
-        """
+        """Termina con la ejecución del programa"""
 
         return True
 
@@ -173,11 +157,11 @@ class Program (Cmd):
 
         super(Program, self).__init__()
 
-        self.user = USER
-        self.currentPath = get_initial_path(self.user)
+        self.user = tools.USER
+        self.currentPath = tools.HOME
         self.newPath = ""
         self.currentFiles = {}
         self.newNameFiles = {}
-        self.prompt = PROMPT
+        self.prompt = tools.PROMPT
 
-        show(self.currentPath, self.currentPath)
+        screen.show(self.currentPath, self.currentPath)
