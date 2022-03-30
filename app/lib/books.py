@@ -6,3 +6,7 @@ class ArgumentError(Exception):
 class ArgumentRangeError(Exception):
 
     pass
+
+class PathError(Exception):
+
+    pass

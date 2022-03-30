@@ -1,9 +1,9 @@
 import app.lib.tools as tools
 import app.lib.screen as screen
-from cmd import Cmd
-from app.lib.books import ArgumentError, ArgumentRangeError
-from colorama import Fore, Style
 from os import system
+from cmd import Cmd
+from app.lib.books import ArgumentError, ArgumentRangeError, PathError
+from colorama import Fore, Style
 
 class Program (Cmd):
 
@@ -54,6 +54,10 @@ class Program (Cmd):
 
             print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
 
+    def complete_select(self, text:str, arg:str, begindx:int, endidx:int):
+
+        return tools.get_complete_select(text)
+
     def do_here(self, arg:str):
 
         """Se mueve a la ruta actual de ejecucion del programa"""
@@ -80,6 +84,10 @@ class Program (Cmd):
 
             print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
 
+    def complete_listing(self, text:str, arg:str, begidx:int, endidx:int):
+
+        return tools.get_complete_listing(text, self.currentPath)
+
     def do_show(self, arg:str):
 
         """
@@ -94,9 +102,13 @@ class Program (Cmd):
             self.newPath = tools.get_current_path(arg, self.currentPath)
             screen.show(self.currentPath, self.newPath)
         
-        except ArgumentError as msg:
+        except PathError as msg:
 
             print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
+
+    def complete_show(self, text:str, arg:str, begidx:int, endidx:int):
+
+        return tools.get_complete_show(text, self.currentPath, self.newPath)
 
     def do_go(self, arg:str):
 
@@ -115,9 +127,15 @@ class Program (Cmd):
 
             print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
 
-    def complete_do(self, text:str, arg:str, begidx:int, endidx:int):
+        except PathError as msg:
 
-        pass
+            print(f"{Fore.LIGHTRED_EX}[-] {msg}{Style.RESET_ALL}")
+
+    def complete_go(self, text:str, arg:str, begidx:int, endidx:int):
+
+        completation = tools.get_complete_go(text, self.currentPath)
+
+        return completation
 
     def do_cls(self, arg:str):
 

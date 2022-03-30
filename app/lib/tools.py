@@ -1,6 +1,5 @@
 import os
-import platform as pf
-from app.lib.books import ArgumentError, ArgumentRangeError
+from app.lib.books import ArgumentError, ArgumentRangeError, PathError
 from time import sleep
 from colorama import Fore, Style
 from re import sub
@@ -10,7 +9,59 @@ SELECT_CMD = ("all", "one", "punctuations_off", "punctuations_spc", "lower", "up
 LISTING_CMD = ("all", "f", "d")
 USER = os.getenv("USER")
 PROMPT = f"{Fore.CYAN}[{USER}]:>{Style.RESET_ALL} "
-HOME = os.path.join(os.sep, 'home', USER)
+HOME = os.path.expanduser('~')
+
+def get_complete_select(text) -> tuple:
+
+    if not text:
+
+        return SELECT_CMD
+
+    else:
+
+        return tuple(i for i in SELECT_CMD if i.startswith(text))
+
+def get_complete_show(text, currentpath, newpath) -> tuple:
+
+    items = tuple()
+
+    if not newpath:
+
+        items = tuple(os.path.split(i)[1] for i in glob(f"{currentpath}/*"))
+    
+    else:
+
+        items = tuple(os.path.split(i)[1] for i in glob(f"{newpath}/*"))
+
+    if not text:
+
+        return items
+
+    else:
+
+        return tuple(i for i in items if i.startswith(text))
+
+def get_complete_listing(text, currenpath) -> tuple:
+
+    if not text:
+
+        return LISTING_CMD
+
+    else:
+
+        return tuple(i for i in LISTING_CMD if i.startswith(text))
+
+def get_complete_go(text, currentpath) -> tuple:
+
+    items = tuple(os.path.split(i)[1] for i in glob(f"{currentpath}/*"))
+
+    if not text:
+
+        return items
+    
+    else:
+
+        return tuple(i for i in items if i.startswith(text))
 
 def splitpathfile(arg:str) -> tuple:
 
@@ -164,10 +215,10 @@ def here() -> str:
 
 def back(*args) -> str:
 
-    lp = args[1].split(f"{os.sep}")
+    lp = args[1].split("/")
     newpath = ""
 
-    if args[0] == "":
+    if not args[0]:
 
         raise ArgumentError("Falta el argumento")
     
@@ -189,19 +240,33 @@ def back(*args) -> str:
 
 def get_current_path(*args) -> str:
 
-    if args[0] == "":
+    pat = ""
 
-        return args[1]
+    if not args[0]:
 
-    return os.path.join(args[1], args[0])
+        pat = args[1]
+
+    else:
+
+        pat = os.path.join(args[1], args[0])
+
+    if not os.path.exists(pat):
+
+        raise PathError("El directorio no existe")
+
+    return pat
 
 def go(*args) -> str:
 
     newpath = ""
 
-    if args[0] == "":
+    if not args[0]:
 
         raise ArgumentError("Argumento Invalido")
+    
+    if not os.path.exists(args[0]):
+
+        raise PathError("El directorio no existe")
         
     newpath = os.path.join(args[1], args[0])
 
