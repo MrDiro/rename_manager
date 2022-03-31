@@ -1,5 +1,5 @@
 import os
-from app.lib.books import ArgumentError, ArgumentRangeError, PathError
+import app.lib.books as bk
 from time import sleep
 from colorama import Fore, Style
 from re import sub
@@ -173,7 +173,7 @@ def select(*args) -> dict:
             currentfiles = {v[0]: str("").join((v[1][0], nm, v[1][2]))}
     else:
 
-        raise ArgumentError("Argumento Invalido")
+        raise bk.ArgumentError("Argumento Invalido")
     
     return currentfiles
 
@@ -203,7 +203,7 @@ def save(*args):
         os.rename(oldname, newname)
 
     print("------------------------------------------------------------")
-    print("{Fore.LIGHTGREEN_EX}[+] Operación realizada exitosa mente!{Style.RESET_ALL}")
+    print(f"{Fore.LIGHTGREEN_EX}[+] Operación realizada exitosa mente!{Style.RESET_ALL}")
 
 def here() -> str:
 
@@ -220,15 +220,15 @@ def back(*args) -> str:
 
     if not args[0]:
 
-        raise ArgumentError("Falta el argumento")
+        raise bk.ArgumentError("Falta el argumento")
     
     elif not args[0].isnumeric():
 
-        raise ArgumentError("Argumento invalido.")
+        raise bk.ArgumentError("Argumento invalido.")
     
     elif int(args[0]) > len(lp[2:]):
 
-        raise ArgumentRangeError("Indice fuera del rango permitido.")
+        raise bk.ArgumentRangeError("Indice fuera del rango permitido.")
     
     del lp[len(lp) - int(args[0]):]
 
@@ -252,7 +252,7 @@ def get_current_path(*args) -> str:
 
     if not os.path.exists(pat):
 
-        raise PathError("El directorio no existe")
+        raise bk.PathError("El directorio no existe")
 
     return pat
 
@@ -262,11 +262,11 @@ def go(*args) -> str:
 
     if not args[0]:
 
-        raise ArgumentError("Argumento Invalido")
+        raise bk.ArgumentError("Argumento Invalido")
     
-    if not os.path.exists(args[0]):
+    if not os.path.exists(os.path.join(args[1], args[0])):
 
-        raise PathError("El directorio no existe")
+        raise bk.PathError("El directorio no existe")
         
     newpath = os.path.join(args[1], args[0])
 
@@ -293,6 +293,6 @@ def listing(*args) -> dict:
     
     else:
 
-        raise ArgumentError("Argumento invalido")
+        raise bk.ArgumentError("Argumento invalido")
 
     return newdom

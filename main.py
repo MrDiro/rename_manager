@@ -1,4 +1,4 @@
-from app.src.main.program import Program
+from app.src.program import Program
 from os import system
 from colorama import Fore, Style
 
