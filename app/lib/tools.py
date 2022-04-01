@@ -81,6 +81,10 @@ def select(*args) -> dict:
     currentfiles = args[1].copy()
 
     if SELECT_CMD[0] in cmd:
+
+        if len(cmd) == 1:
+
+            raise bk.ArgumentError("Faltan los argumentos modificadores")
         
         if SELECT_CMD[2] in cmd:
 
@@ -118,10 +122,18 @@ def select(*args) -> dict:
 
         if SELECT_CMD[10] in cmd:
 
-            nm = str("").join(cmd[cmd.index(SELECT_CMD[10]) + 1:])
+            nm = str(" ").join(cmd[cmd.index(SELECT_CMD[10]) + 1:])
             currentfiles = dict(map(lambda v : (v[0], str("").join((v[1][0], f"{nm} {int(v[0]):02}", v[1][2]))), slice_all(**currentfiles).items()))
 
     elif SELECT_CMD[1] in cmd:
+
+        if len(cmd) == 1:
+
+            raise bk.ArgumentError("No ha seleccionado algun archivo.")
+
+        elif len(cmd) == 2:
+
+            raise bk.ArgumentError("Faltan los argumentos modificadores")
 
         if SELECT_CMD[2] in cmd:
 
@@ -168,7 +180,7 @@ def select(*args) -> dict:
         if SELECT_CMD[10] in cmd:
             
             #corregir la entrada del nombre con espacios
-            nm = str("").join(cmd[cmd.index(SELECT_CMD[10]) + 1:])
+            nm = str(" ").join(cmd[cmd.index(SELECT_CMD[10]) + 1 :])
             v = slice_one(cmd, **currentfiles)
             currentfiles = {v[0]: str("").join((v[1][0], nm, v[1][2]))}
     else:
